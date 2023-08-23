@@ -1,68 +1,55 @@
 import { Component } from 'react';
+import { fetchPokemon } from 'services/pokemon-api';
+
+import ErrorView from '../ErrorView';
+import DataView from '../DataViev';
+import PendingViev from '../PendingView';
 
 class PokemonInfo extends Component {
   state = {
-    loading: false,
     pokemon: null,
     error: null,
+    status: 'idle',
   };
 
-  getPokemonData = () => {
-    const { searchQuery } = this.props;
-    if (this.props.searchQuery === '') {
+  getPokemonData = searchQuery => {
+    if (searchQuery === '') {
       return;
     }
-    this.setState({ loading: true, pokemon: null, error: null });
+    this.setState({ status: 'pending' });
 
-    setTimeout(() => {
-      fetch(`https://pokeapi.co/api/v2/pokemon/${searchQuery}`)
-        .then(response => {
-          if (response.ok) return response.json();
-          return Promise.reject(
-            new Error(`Имя покемона ${searchQuery} не найдено`)
-          );
-        })
-        .then(pokemon => {
-          this.setState({ pokemon }, () => {
-            console.log(this.state);
-          });
-        })
-        .catch(error => {
-          this.setState({ error }, () => {
-            console.log(this.state);
-          });
-        })
-        .finally(() => {
-          this.setState({ loading: false });
-        });
-    }, 500);
+    fetchPokemon(searchQuery)
+      .then(pokemon => {
+        this.setState({ pokemon, status: 'resolved' });
+      })
+      .catch(error => {
+        this.setState({ error, status: 'rejected' });
+      });
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.searchQuery !== this.props.searchQuery) this.getPokemonData();
+  componentDidUpdate(prevProps) {
+    const { searchQuery } = this.props;
+    if (prevProps.searchQuery !== searchQuery) this.getPokemonData(searchQuery);
   }
 
   render() {
-    const { pokemon, loading, error } = this.state;
-    const { searchQuery } = this.props;
-    return (
-      <div>
-        {!searchQuery && <p>Put pokemon name</p>}
-        {loading && <p>Loading...</p>}
-        {pokemon && (
-          <div>
-            <p>Name: {pokemon.name}</p>{' '}
-            <img
-              src={pokemon.sprites.other['official-artwork'].front_default}
-              alt={pokemon.name}
-              width={'150px'}
-              height={'150px'}
-            />
-          </div>
-        )}
-        {error && <p>{error.message}</p>}
-      </div>
-    );
+    const { pokemon, error, status } = this.state;
+
+    if (status === 'idle') {
+      return <p>Put pokemon name</p>;
+    }
+
+    if (status === 'pending') {
+      return <PendingViev pokemonName={this.props.searchQuery} />;
+    }
+
+    if (status === 'resolved') {
+      return <DataView pokemon={pokemon} />;
+    }
+
+    if (status === 'rejected') {
+      return <ErrorView message={error.message}></ErrorView>;
+    }
   }
 }
 

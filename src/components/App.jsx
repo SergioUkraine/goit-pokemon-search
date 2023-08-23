@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Container } from './App.styled';
 
 import PokemonForm from './PokemonForm';
 import PokemonInfo from './PokemonInfo';
@@ -17,11 +18,11 @@ class App extends Component {
 
   render() {
     return (
-      <div>
+      <Container>
         <PokemonForm onSubmit={this.handlePokemonFormSubmit} />
         <PokemonInfo searchQuery={this.state.searchQuery} />
         <ToastContainer />
-      </div>
+      </Container>
     );
   }
 }
