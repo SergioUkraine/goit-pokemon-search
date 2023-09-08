@@ -6,39 +6,46 @@ import ErrorView from '../ErrorView';
 import DataView from '../DataViev';
 import PendingViev from '../PendingView';
 
+const Status = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+  REJECTED: 'rejected',
+};
+
 function PokemonInfo({ searchQuery }) {
   const [pokemon, setPokemon] = useState(null);
   const [error, setError] = useState(null);
-  const [status, setStatus] = useState('idle');
+  const [status, setStatus] = useState(Status.IDLE);
 
   useEffect(() => {
     if (searchQuery === '') return;
 
-    setStatus('pending');
+    setStatus(Status.PENDING);
     fetchPokemon(searchQuery)
       .then(pokemon => {
+        setStatus(Status.RESOLVED);
         setPokemon(pokemon);
-        setStatus('resolved');
       })
       .catch(error => {
         setError(error);
-        setStatus('rejected');
+        setStatus(Status.REJECTED);
       });
   }, [searchQuery]);
 
-  if (status === 'idle') {
+  if (status === Status.IDLE) {
     return <p>Put pokemon name</p>;
   }
 
-  if (status === 'pending') {
+  if (status === Status.PENDING) {
     return <PendingViev pokemonName={searchQuery} />;
   }
 
-  if (status === 'resolved') {
+  if (status === Status.RESOLVED) {
     return <DataView pokemon={pokemon} />;
   }
 
-  if (status === 'rejected') {
+  if (status === Status.REJECTED) {
     return <ErrorView message={error.message}></ErrorView>;
   }
 }
