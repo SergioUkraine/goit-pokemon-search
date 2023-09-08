@@ -1,44 +1,43 @@
-import React, { Component } from 'react';
+import { useState } from 'react';
 import { ImSearch } from 'react-icons/im';
+import PropTypes from 'prop-types';
 import { Container, SearchInput, SearchButton } from './PokemonForm.styled';
 
 import { toast } from 'react-toastify';
 
-class PokemonForm extends Component {
-  state = { pokemonName: '' };
+function PokemonForm({ onSubmit }) {
+  const [pokemonName, setPokemonName] = useState('');
 
-  handleNameChange = e => {
-    this.setState({
-      [e.currentTarget.name]: e.currentTarget.value.toLowerCase(),
-    });
+  const handleNameChange = e => {
+    setPokemonName(e.currentTarget.value.toLowerCase());
   };
-
-  handleFormSubmit = e => {
+  const handleFormSubmit = e => {
     e.preventDefault();
-    if (this.state.pokemonName.trim() === '') {
+    if (pokemonName.trim() === '') {
       toast.warn('Put request query');
       return;
     }
-    this.props.onSubmit(this.state.pokemonName);
-    this.setState({ pokemonName: '' });
+    onSubmit(pokemonName);
+    setPokemonName('');
   };
-
-  render() {
-    return (
-      <Container onSubmit={this.handleFormSubmit}>
-        <SearchInput
-          type="text"
-          name="pokemonName"
-          value={this.state.pokemonName}
-          onChange={this.handleNameChange}
-        />
-        <SearchButton type="submit">
-          <ImSearch style={{ marginRight: 8 }} />
-          Search
-        </SearchButton>
-      </Container>
-    );
-  }
+  return (
+    <Container onSubmit={handleFormSubmit}>
+      <SearchInput
+        type="text"
+        name="pokemonName"
+        value={pokemonName}
+        onChange={handleNameChange}
+      />
+      <SearchButton type="submit">
+        <ImSearch style={{ marginRight: 8 }} />
+        Search
+      </SearchButton>
+    </Container>
+  );
 }
+
+PokemonForm.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};
 
 export default PokemonForm;

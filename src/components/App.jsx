@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useState } from 'react';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -7,24 +7,20 @@ import { Container } from './App.styled';
 import PokemonForm from './PokemonForm';
 import PokemonInfo from './PokemonInfo';
 
-class App extends Component {
-  state = {
-    searchQuery: '',
+function App() {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handlePokemonFormSubmit = query => {
+    setSearchQuery(query);
   };
 
-  handlePokemonFormSubmit = query => {
-    this.setState({ searchQuery: query });
-  };
-
-  render() {
-    return (
-      <Container>
-        <PokemonForm onSubmit={this.handlePokemonFormSubmit} />
-        <PokemonInfo searchQuery={this.state.searchQuery} />
-        <ToastContainer />
-      </Container>
-    );
-  }
+  return (
+    <Container>
+      <PokemonForm onSubmit={handlePokemonFormSubmit} />
+      <PokemonInfo searchQuery={searchQuery} />
+      <ToastContainer />
+    </Container>
+  );
 }
 
 export default App;

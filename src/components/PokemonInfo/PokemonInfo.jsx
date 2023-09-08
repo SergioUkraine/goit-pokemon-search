@@ -1,56 +1,54 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { fetchPokemon } from 'services/pokemon-api';
+import PropTypes from 'prop-types';
 
 import ErrorView from '../ErrorView';
 import DataView from '../DataViev';
 import PendingViev from '../PendingView';
 
-class PokemonInfo extends Component {
-  state = {
-    pokemon: null,
-    error: null,
-    status: 'idle',
-  };
+function PokemonInfo({ searchQuery }) {
+  const [pokemon, setPokemon] = useState(null);
+  const [error, setError] = useState(null);
+  const [status, setStatus] = useState('idle');
 
-  getPokemonData = searchQuery => {
-    if (searchQuery === '') {
-      return;
-    }
-    this.setState({ status: 'pending' });
+  const getPokemonData = searchQuery => {
+    if (searchQuery === '') return;
 
+    setStatus('pending');
     fetchPokemon(searchQuery)
       .then(pokemon => {
-        this.setState({ pokemon, status: 'resolved' });
+        setPokemon(pokemon);
+        setStatus('resolved');
       })
       .catch(error => {
-        this.setState({ error, status: 'rejected' });
+        setError(error);
+        setStatus('rejected');
       });
   };
 
-  componentDidUpdate(prevProps) {
-    const { searchQuery } = this.props;
-    if (prevProps.searchQuery !== searchQuery) this.getPokemonData(searchQuery);
+  useEffect(() => {
+    getPokemonData(searchQuery);
+  }, [searchQuery]);
+
+  if (status === 'idle') {
+    return <p>Put pokemon name</p>;
   }
 
-  render() {
-    const { pokemon, error, status } = this.state;
+  if (status === 'pending') {
+    return <PendingViev pokemonName={searchQuery} />;
+  }
 
-    if (status === 'idle') {
-      return <p>Put pokemon name</p>;
-    }
+  if (status === 'resolved') {
+    return <DataView pokemon={pokemon} />;
+  }
 
-    if (status === 'pending') {
-      return <PendingViev pokemonName={this.props.searchQuery} />;
-    }
-
-    if (status === 'resolved') {
-      return <DataView pokemon={pokemon} />;
-    }
-
-    if (status === 'rejected') {
-      return <ErrorView message={error.message}></ErrorView>;
-    }
+  if (status === 'rejected') {
+    return <ErrorView message={error.message}></ErrorView>;
   }
 }
+
+PokemonInfo.propTypes = {
+  searchQuery: PropTypes.string.isRequired,
+};
 
 export default PokemonInfo;

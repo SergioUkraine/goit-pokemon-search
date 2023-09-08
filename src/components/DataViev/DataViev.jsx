@@ -1,4 +1,9 @@
-export default function DataView({ pokemon: { sprites, name, stats } }) {
+import PropTypes from 'prop-types';
+
+function DataView({ pokemon: { sprites, name, stats } }) {
+  console.log(typeof sprites);
+  console.log(typeof name);
+  console.log(typeof stats);
   return (
     <div>
       <p>Name: {name}</p>
@@ -18,3 +23,9 @@ export default function DataView({ pokemon: { sprites, name, stats } }) {
     </div>
   );
 }
+
+DataView.propTypes = {
+  pokemon: PropTypes.object.isRequired,
+};
+
+export default DataView;

@@ -1,8 +1,9 @@
 import { ImSpinner } from 'react-icons/im';
+import PropTypes from 'prop-types';
 import pendingImage from '../../images/unknown.jpg';
 import DataViev from '../DataViev';
 
-export default function PendingViev({ pokemonName }) {
+function PendingViev({ pokemonName }) {
   const pokemon = {
     name: pokemonName,
     sprites: {
@@ -22,3 +23,9 @@ export default function PendingViev({ pokemonName }) {
     </div>
   );
 }
+
+PendingViev.propTypes = {
+  pokemonName: PropTypes.string.isRequired,
+};
+
+export default PendingViev;
