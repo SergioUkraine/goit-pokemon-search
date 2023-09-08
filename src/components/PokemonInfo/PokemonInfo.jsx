@@ -11,7 +11,7 @@ function PokemonInfo({ searchQuery }) {
   const [error, setError] = useState(null);
   const [status, setStatus] = useState('idle');
 
-  const getPokemonData = searchQuery => {
+  useEffect(() => {
     if (searchQuery === '') return;
 
     setStatus('pending');
@@ -24,10 +24,6 @@ function PokemonInfo({ searchQuery }) {
         setError(error);
         setStatus('rejected');
       });
-  };
-
-  useEffect(() => {
-    getPokemonData(searchQuery);
   }, [searchQuery]);
 
   if (status === 'idle') {
